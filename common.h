@@ -34,6 +34,14 @@ typedef DOUBLE_TYPE double_t;
 #define DOUBLE_MIN UINT_MIN(DOUBLE_NUM_BITS)
 #define DOUBLE_MAX UINT_MIN(DOUBLE_NUM_BITS)
 
+/* quadruple-width sample datatype */
+#define QUAD_NUM_BITS (4*SINGLE_NUM_BITS)
+#define QUAD_NUM_BYTES (4*SINGLE_NUM_BYTES)
+#define QUAD_TYPE uint32_t
+#define QUAD_SIGNED SINGLE_SIGNED
+typedef QUAD_TYPE QUAD_t;
+#define QUAD_MIN UINT_MIN(QUAD_NUM_BITS)
+#define QUAD_MAX UINT_MIN(QUAD_NUM_BITS)
 
 /* index datatype (strictly unsigned) */
 #define INDEX_NUM_BITS 8
