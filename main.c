@@ -15,5 +15,11 @@ int main()
     }
     printf("\n");
 
+    autocorr_lessnaive(in,out,size);
+    for(index_t i = 0; i < size; i++) {
+        printf("%u ",out[i]);
+    }
+    printf("\n");
+
     return 0;
 }

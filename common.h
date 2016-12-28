@@ -39,7 +39,7 @@ typedef DOUBLE_TYPE double_t;
 #define QUAD_NUM_BYTES (4*SINGLE_NUM_BYTES)
 #define QUAD_TYPE uint32_t
 #define QUAD_SIGNED SINGLE_SIGNED
-typedef QUAD_TYPE QUAD_t;
+typedef QUAD_TYPE quadr_t;
 #define QUAD_MIN UINT_MIN(QUAD_NUM_BITS)
 #define QUAD_MAX UINT_MIN(QUAD_NUM_BITS)
 
