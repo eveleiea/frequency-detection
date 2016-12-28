@@ -21,7 +21,7 @@
 #define SINGLE_NUM_BYTES 1
 #define SINGLE_SIGNED FALSE
 #define SINGLE_TYPE uint8_t
-typedef SINGLE_TYPE single_t;
+typedef SINGLE_TYPE SINGLE;
 #define SINGLE_MIN UINT_MIN(SINGLE_NUM_BITS)
 #define SINGLE_MAX UINT_MAX(SINGLE_NUM_BITS)
 
@@ -30,18 +30,18 @@ typedef SINGLE_TYPE single_t;
 #define DOUBLE_NUM_BYTES (2*SINGLE_NUM_BYTES)
 #define DOUBLE_TYPE uint16_t
 #define DOUBLE_SIGNED SINGLE_SIGNED
-typedef DOUBLE_TYPE double_t;
+typedef DOUBLE_TYPE DOUBLE;
 #define DOUBLE_MIN UINT_MIN(DOUBLE_NUM_BITS)
-#define DOUBLE_MAX UINT_MIN(DOUBLE_NUM_BITS)
+#define DOUBLE_MAX UINT_MAX(DOUBLE_NUM_BITS)
 
 /* quadruple-width sample datatype */
 #define QUAD_NUM_BITS (4*SINGLE_NUM_BITS)
 #define QUAD_NUM_BYTES (4*SINGLE_NUM_BYTES)
 #define QUAD_TYPE uint32_t
 #define QUAD_SIGNED SINGLE_SIGNED
-typedef QUAD_TYPE quadr_t;
+typedef QUAD_TYPE QUAD;
 #define QUAD_MIN UINT_MIN(QUAD_NUM_BITS)
-#define QUAD_MAX UINT_MIN(QUAD_NUM_BITS)
+#define QUAD_MAX UINT_MAX(QUAD_NUM_BITS)
 
 /* index datatype (strictly unsigned) */
 #define INDEX_NUM_BITS 8
@@ -49,7 +49,7 @@ typedef QUAD_TYPE quadr_t;
 #define INDEX_TYPE uint8_t
 typedef INDEX_TYPE index_t;
 #define INDEX_MIN UINT_MIN(INDEX_NUM_BITS)
-#define INDEX_MAX UINT_MIN(INDEX_NUM_BITS)
+#define INDEX_MAX UINT_MAX(INDEX_NUM_BITS)
 
 
 #endif // COMMON_H_INCLUDED
