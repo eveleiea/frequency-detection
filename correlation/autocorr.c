@@ -51,7 +51,6 @@ void autocorr_binary(autocorr_input_t* in, autocorr_output_t* out, index_t size)
     }
 }
 
-#define AUTOCORR_TEST
 
 /* test section for the above functions */
 #ifdef AUTOCORR_TEST
