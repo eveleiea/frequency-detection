@@ -2,19 +2,18 @@
 %  
 
 % define a sampling frequency to assume
-fs = 1000;
+fs = 4000;
 Ts = 1/fs;
 
 % define the function to sample
-freq = 73;
-omega = 2*pi*freq;
-func = @(n) sin(omega*n*Ts);
+freq = 200;
+func = @(n) sin(2*pi*freq*n*Ts);
 
 % number of samples to generate, number to view
-N = 100;
+N = 200;
 n = 0:1:N;
 % change to view a fixed amount of lag samples
-n_max = N;
+n_max = 100;
 
 % sample waveform and view it
 x = func(n);
@@ -37,6 +36,13 @@ Rxx = Rxx(1,1:n_max);
 lag = lag(1,1:n_max);
 subplot(2,1,2);
 plot(lag,Rxx);
-title('Positive Lag Autocorrelation');
+%title('Positive Lag Autocorrelation');
 xlabel('\tau (samples)');
 ylabel('R_{xx}(\tau)');
+
+peaks = findPeaks(Rxx);
+hold on;
+plot(peaks-1, Rxx(1,peaks),'.');
+hold off;
+
+title(['Autocorrelation Frequency Estimate = ' num2str(1/(2*(peaks(1)-1)*Ts)) ' Hz']);
