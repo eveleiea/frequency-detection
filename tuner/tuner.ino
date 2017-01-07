@@ -3,7 +3,7 @@
 #define PRESCALER 64
 #define N_VALUE 6
 #define SAMPLING_FREQUENCY (F_CPU)
-#define NUM_SAMPLES 1024
+#define NUM_SAMPLES 512
 #define SAMPLING_FREQUENCY (((float)F_CPU)/(PRESCALER*(1+N_VALUE)))
 
 volatile char sample[NUM_SAMPLES];
@@ -26,7 +26,7 @@ void loop() {
   startSampling();
   while(sampleCount < NUM_SAMPLES);
   stopSampling();
-  freq = autoCorrelateFrequency((char*)sample, NUM_SAMPLES, SAMPLING_FREQUENCY);
+  freq = autoCorrelateFrequencyBetter((char*)sample, NUM_SAMPLES, SAMPLING_FREQUENCY);
   
   Serial.print(freq);
   Serial.print('\n');

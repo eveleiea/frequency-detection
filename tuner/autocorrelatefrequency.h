@@ -50,3 +50,41 @@ float autoCorrelateFrequency(char * sample, int len, float sampleFreq)
 
   return sampleFreq/period;
 }
+
+float autoCorrelateFrequencyBetter(char * in, uint16_t len, volatile float sampleFreq) {
+  uint16_t lag = 0;
+  uint16_t i = 0;
+  uint16_t sum;
+  uint16_t lastSum;
+
+  bool minFound = false;
+  uint16_t lastMax = 0;
+  uint16_t lastMaxLag = 0;
+
+  for(lag = 0; lag < len; lag++) {
+      sum = 0;
+      for(i = 0; i < (len-lag); i++) {
+          /* binary multiplication reduces to logical and */
+          sum += (in[i]&in[i+lag])&1;
+      }
+
+      if(minFound) {
+        if(sum > lastMax) {
+          lastMax = sum;
+          lastMaxLag = lag;
+        }
+      }
+      else {
+        if(sum > lastSum) {
+          minFound = true;
+          lastMax = sum;
+          lastMaxLag = lag; 
+        }
+      }
+
+      lastSum = sum;
+  }
+
+  return sampleFreq / lastMaxLag;
+}
+
