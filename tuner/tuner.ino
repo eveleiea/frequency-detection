@@ -1,3 +1,5 @@
+#include "autocorrelatefrequency.h"
+
 #define PRESCALER 64
 #define N_VALUE 6
 #define SAMPLING_FREQUENCY (F_CPU)
@@ -5,78 +7,25 @@
 #define SAMPLING_FREQUENCY (((float)F_CPU)/(PRESCALER*(1+N_VALUE)))
 
 volatile char sample[NUM_SAMPLES];
-
 volatile uint16_t sampleCount;
-
-//    FILE: frequencyDSP.ino
-//  AUTHOR: rob tillaart (org version akellyirl)
-// VERSION: 0.1.03
-// PURPOSE: frequency analysis using DSP
-//    DATE: 2013-10-27
-//     URL: http://www.instructables.com/id/Reliable-Frequency-Detection-Using-DSP-Techniques
-float autoCorrelateFrequency(char * sample, int len, float sampleFreq)
-{
-  long sum = 0;
-  long sum_old = 0;
-  int thresh = 0;
-  byte pd_state = 0;
-  int period = 0;  // 0 results in inf
-
-  // Autocorrelation
-  for (int i=0; i < len && (pd_state != 3); i++)
-  {
-    sum_old = sum;
-    sum = 0;
-
-    for (int k=0; k <len-i; k++)
-    {
-      sum += ((sample[k]) & (sample[k+i]))&1;
-    }
-    sum /= 256;
-
-    // Peak Detect State Machine
-    // 0: initial, set threshold
-    // 1: detect positive slope
-    // 2: detect negative slope
-    // 3: peak found
-    if (pd_state == 0)
-    {
-      thresh = sum / 2;
-      pd_state = 1;
-    } 
-    else if (pd_state == 1 && (sum > thresh) && (sum - sum_old) > 0) 
-    {
-      pd_state = 2;
-    }
-    else if (pd_state == 2 && (sum - sum_old) <= 0) 
-    {
-      period = i;
-      pd_state = 3;
-    } 
-  }
-
-  return sampleFreq/period;
-}
 
 
 void setup() {
   // put your setup code here, to run once:
   setupTimer();
-  Serial.begin(57600);
-  pinMode(12,INPUT);
-  TIMSK1 = 0;
-  TIMSK2 = 0;
-
+  setupPins();
+  
+  Serial.begin(115200);
 }
 
-int i = 0;
 float freq;
 void loop() {
   // put your main code here, to run repeatedly:
 
-  //digitalWrite(13,LOW);
+  digitalWrite(13,HIGH);
   startSampling();
   while(sampleCount < NUM_SAMPLES);
+  stopSampling();
   freq = autoCorrelateFrequency((char*)sample, NUM_SAMPLES, SAMPLING_FREQUENCY);
   
   Serial.print(freq);
@@ -84,12 +33,21 @@ void loop() {
   //digitalWrite(13,HIGH);
 }
 
-/* configure initial settings for 8-bit Timer0 */
-volatile int16_t lastTime;
-volatile uint8_t ovfCount;
-void setupTimer() {
-  lastTime = 0;
+// https://www.arduino.cc/en/Reference/PortManipulation
+void setupPins() {
+  // set Arduino pin 7 as an input
+  // it is bit 7 of PORT B
+  PORTD &= ~_BV(PD7); // disable pull up on pin 7
+  DDRD &= ~_BV(PD7); // clear bit 7 to make it an input
 
+  // set Arduino pin 13 as output (L LED)
+  PORTB &= ~_BV(PB5); // set output as LOW by default.
+  DDRB |= _BV(5);
+
+}
+
+/* configure initial settings for 8-bit Timer0 */
+void setupTimer() {
   // disable interrupts while we are configuring things
   cli();
   
@@ -103,11 +61,16 @@ void setupTimer() {
   // f_int = f_cpu / (N*(1+OCR1A))
   OCR0A = N_VALUE;
   // OCR0A is pin 6 on arduino
-  pinMode(6,OUTPUT);
-  //DDRB &= ~_BV(PB0);
+  // set Arduino pin 6 as output 
+  PORTD &= ~_BV(PD6); // low as default
+  DDRD |= _BV(PD6);
 
   // disable overflow interrupt
   TIMSK0 &= ~_BV(OCIE0A);
+
+  // Kill Arduino environment timer interrupts
+  TIMSK1 = 0;
+  TIMSK2 = 0;
   
   // enable interrupts once again
   sei();
@@ -126,19 +89,28 @@ void startSampling() {
   sei();
 }
 
-void stopSampling() {
+inline void stopSampling() {
   // disable overflow interrupt
   TIMSK0 &= ~_BV(OCIE0A);
 }
 
 /* take a sample from the source */
 inline char takeSample() {
-  return (PINB>>4)&1;//digitalRead(12);
+  return ((PIND&_BV(PD7)) != 0)?1:0;//digitalRead(7);
 }
 
+char temp;
+volatile byte state;
 ISR(TIMER0_COMPA_vect) {
+  temp = takeSample();
+  
+  state++;
+  digitalWrite(13,state&1);
+  //PORTB &= ~_BV(PB5);
+  //PORTB |= (state&1)<<5;
+  
   if(sampleCount < NUM_SAMPLES) {
-    sample[sampleCount] = takeSample();
+    sample[sampleCount] = temp;
     sampleCount++;
   }
 }
